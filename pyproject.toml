@@ -30,6 +30,7 @@ dependencies = [
     "rich>=13.0",
     "pydub>=0.25",
     "mutagen>=1.47",
+    "PyYAML>=6.0",
 ]
 
 [project.optional-dependencies]

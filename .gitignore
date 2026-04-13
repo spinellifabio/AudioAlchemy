@@ -35,6 +35,9 @@ env/
 .DS_Store
 Thumbs.db
 
+# Tools
+.vexp/
+
 # Distribution
 *.whl
 *.tar.gz

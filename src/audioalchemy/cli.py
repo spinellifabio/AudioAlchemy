@@ -17,6 +17,7 @@ from rich.console import Console
 
 from audioalchemy.config.settings import get_settings
 from audioalchemy.services.pipeline import ConversionPipeline
+from audioalchemy.utils.album_meta import ALBUM_MD_FILENAME, ALBUM_MD_TEMPLATE
 from audioalchemy.utils.logging import configure_logging
 
 app = typer.Typer(
@@ -89,3 +90,43 @@ def convert(
     pipeline.run(input_dir=input_dir, output_dir=output_dir)
 
     console.print("[bold green]Done.[/bold green]")
+
+
+@app.command("init-album")
+def init_album(
+    directory: Path = typer.Argument(
+        ...,
+        help="Directory where the album metadata template will be created.",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        writable=True,
+        resolve_path=True,
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        help=f"Overwrite an existing {ALBUM_MD_FILENAME}.",
+    ),
+) -> None:
+    """Generate an album metadata template (_album.md) in DIRECTORY.
+
+    Edit the generated file to fill in shared album tags (title, year,
+    artist, genre, etc.). These values are merged into every track's
+    metadata during conversion.
+
+    Example::
+
+        audioalchemy init-album ./music
+    """
+    target = directory / ALBUM_MD_FILENAME
+
+    if target.exists() and not force:
+        console.print(
+            f"[yellow]{target}[/yellow] already exists. "
+            "Use [bold]--force[/bold] to overwrite."
+        )
+        raise typer.Exit(code=1)
+
+    target.write_text(ALBUM_MD_TEMPLATE, encoding="utf-8")
+    console.print(f"[bold green]Created[/bold green] [cyan]{target}[/cyan]")
