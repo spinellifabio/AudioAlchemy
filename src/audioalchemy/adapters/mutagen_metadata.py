@@ -17,7 +17,7 @@ _ID3_TAG_MAP: dict[str, str] = {
     "album": "TALB",
     "album_artist": "TPE2",
     "tracknumber": "TRCK",
-    "year": "TDRC",
+    "date": "TDRC",
     "genre": "TCON",
     "comment": "COMM",
 }

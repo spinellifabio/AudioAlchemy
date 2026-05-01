@@ -96,7 +96,7 @@ Place a `_album.md` file in any audio directory to define shared album-level met
 ```markdown
 ---
 album: "Wind Ensemble Classics"
-year: "2024"
+date: "2026-04-11"
 album_artist: "Tokyo Wind Ensemble"
 genre: "Classical"
 comment: "Recorded live at Suntory Hall"
@@ -111,7 +111,7 @@ Any freeform text here is ignored by the parser.
 | Field | Description |
 |---|---|
 | `album` | Album title |
-| `year` | Release year |
+| `date` | Recording/release date — any ISO format accepted (`2026`, `2026-04`, `2026-04-11`) |
 | `album_artist` | Album-level artist (e.g. ensemble or band name) |
 | `genre` | Genre |
 | `comment` | Free-form comment |
