@@ -58,3 +58,36 @@ class TestParseFilename:
 
     def test_returns_track_info_type(self) -> None:
         assert isinstance(parse_filename("01 Test - Artist"), TrackInfo)
+
+    def test_embedded_arranger_no_dash_separator(self) -> None:
+        """Arranger credit after a comma with no ' - ' separator is extracted."""
+        info = parse_filename("08 ABBA GOLD, Arr. Ron Sebregts")
+        assert info.track_number == 8
+        assert info.title == "ABBA GOLD"
+        assert info.artists == ["Arr. Ron Sebregts"]
+
+    def test_embedded_arranger_with_suffix(self) -> None:
+        """Trailing (bis) belongs to the track title, not the arranger."""
+        info = parse_filename("12 ABBA GOLD, Arr. Ron Sebregts (bis)")
+        assert info.track_number == 12
+        assert info.title == "ABBA GOLD (bis)"
+        assert info.artists == ["Arr. Ron Sebregts"]
+
+    def test_dash_separated_arranger_with_suffix(self) -> None:
+        """Trailing (bis) is moved to title even when ' - ' separator is used."""
+        info = parse_filename("11 West Side Story - Leonard Bernstein, Arr. Naohiro Iwai (bis)")
+        assert info.track_number == 11
+        assert info.title == "West Side Story (bis)"
+        assert info.artists == ["Leonard Bernstein", "Arr. Naohiro Iwai"]
+
+    def test_identifier_paren_not_stripped(self) -> None:
+        """Paren with no preceding space (e.g. 'Bittmar(01)') stays in artist name."""
+        info = parse_filename("01 Song - Andrew Lloyd Webber, Arr. Bittmar(01)")
+        assert info.artists == ["Andrew Lloyd Webber", "Arr. Bittmar(01)"]
+        assert info.title == "Song"
+
+    def test_title_with_comma_not_arr_unchanged(self) -> None:
+        """Commas inside a title that don't precede 'Arr.' are preserved."""
+        info = parse_filename("03 Interlude, Part II")
+        assert info.title == "Interlude, Part II"
+        assert info.artists == []

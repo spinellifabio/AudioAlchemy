@@ -15,6 +15,8 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
+from audioalchemy.adapters.mutagen_metadata import MutagenMetadataManager
+from audioalchemy.adapters.pydub_converter import PydubConverter
 from audioalchemy.config.settings import get_settings
 from audioalchemy.services.pipeline import ConversionPipeline
 from audioalchemy.utils.album_meta import ALBUM_MD_FILENAME, ALBUM_MD_TEMPLATE
@@ -60,6 +62,11 @@ def convert(
         "-f",
         help=f"Output audio format. Supported: {', '.join(_SUPPORTED_FORMATS)}.",
     ),
+    recursive: bool = typer.Option(
+        False,
+        "--recursive/--no-recursive",
+        help="Include audio files in sub-directories (default: no).",
+    ),
 ) -> None:
     """Convert all audio files in INPUT_DIR to the target format.
 
@@ -86,8 +93,13 @@ def convert(
         f"([bold]{output_format}[/bold])"
     )
 
-    pipeline = ConversionPipeline(settings=settings, output_format=output_format)
-    pipeline.run(input_dir=input_dir, output_dir=output_dir)
+    pipeline = ConversionPipeline(
+        settings=settings,
+        output_format=output_format,
+        converter=PydubConverter(),
+        metadata_manager=MutagenMetadataManager(),
+    )
+    pipeline.run(input_dir=input_dir, output_dir=output_dir, recursive=recursive)
 
     console.print("[bold green]Done.[/bold green]")
 

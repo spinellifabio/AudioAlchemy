@@ -4,6 +4,8 @@ Uses ``typer.testing.CliRunner`` to invoke commands in-process without
 spawning a subprocess, making tests fast and portable.
 """
 
+from unittest.mock import patch
+
 import pytest
 from typer.testing import CliRunner
 
@@ -49,18 +51,21 @@ def test_convert_empty_directory(tmp_path: pytest.TempPathFactory) -> None:
     assert result.exit_code == 0
 
 
-def test_convert_stub_runs(tmp_path: pytest.TempPathFactory) -> None:
-    """Stub pipeline should handle a fake audio file path without raising."""
+def test_convert_runs(tmp_path: pytest.TempPathFactory) -> None:
+    """Pipeline should call converter and metadata manager for each audio file."""
     input_dir = tmp_path / "input"
     input_dir.mkdir()
-    # Create a dummy file with a recognised audio extension.
     (input_dir / "track.wav").write_bytes(b"\x00" * 16)
-
     output_dir = tmp_path / "output"
 
-    result = runner.invoke(
-        app,
-        ["convert", str(input_dir), str(output_dir), "--format", "mp3"],
-    )
+    with (
+        patch("audioalchemy.adapters.pydub_converter.PydubConverter.convert"),
+        patch("audioalchemy.adapters.mutagen_metadata.MutagenMetadataManager.write"),
+    ):
+        result = runner.invoke(
+            app,
+            ["convert", str(input_dir), str(output_dir), "--format", "mp3"],
+        )
+
     assert result.exit_code == 0
     assert "Done" in result.output

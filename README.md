@@ -6,18 +6,15 @@ A CLI tool for batch audio conversion and metadata management.
 
 ## Features
 
-**Implemented:**
 - Batch audio file discovery (MP3, WAV, FLAC, OGG, AAC, M4A, WMA, OPUS)
 - Album-level metadata via `_album.md` YAML frontmatter
 - Per-track metadata extraction from structured filenames
 - Pipeline orchestration with metadata merging
+- Audio format conversion via pydub / ffmpeg
+- Metadata tag writing (ID3 for MP3, VorbisComment for FLAC/OGG)
 - `init-album` command to scaffold album metadata templates
 - Structured logging with Rich output
 - Environment-based configuration via Pydantic settings
-
-**In progress (stubs):**
-- Audio format conversion (pydub)
-- Metadata tag writing to audio files (mutagen)
 
 ---
 
@@ -48,18 +45,23 @@ cp .env.example .env
 ### Convert audio files
 
 ```bash
-audioalchemy convert INPUT_DIR OUTPUT_DIR [--format FORMAT]
+audioalchemy convert INPUT_DIR OUTPUT_DIR [--format FORMAT] [--recursive]
 ```
 
 | Argument | Description |
 |---|---|
-| `INPUT_DIR` | Source directory containing audio files (searched recursively) |
+| `INPUT_DIR` | Source directory containing audio files |
 | `OUTPUT_DIR` | Destination directory (created if missing) |
 | `--format, -f` | Output format: `mp3`, `wav`, `flac`, `ogg`, `aac` (default: `mp3`) |
+| `--recursive` | Also convert files in sub-directories (default: off) |
+| `--no-recursive` | Explicitly limit to top-level directory only |
 
 ```bash
-# Convert all audio files to FLAC
+# Convert all audio files in a single directory to FLAC
 audioalchemy convert ./input ./output --format flac
+
+# Include sub-directories
+audioalchemy convert ./input ./output --format flac --recursive
 
 # Use the default format from .env
 audioalchemy convert ./input ./output
@@ -126,19 +128,22 @@ The pipeline parses structured filenames to extract per-track metadata automatic
 
 **Pattern:**
 ```
-{NN} {Title} - {Artist1}, {Artist2} - arr. {Arranger}
+{NN} {Title} - {Artist1}, {Artist2}, Arr. {Arranger}
 ```
 
 - `{NN}` — optional zero-padded track number followed by a space
 - `{Title}` — track title (hyphens within the title are preserved)
-- ` - ` — segment separator (space-hyphen-space)
-- Remaining segments — comma-separated artist names; arranger credits (`arr.`) are included as-is
+- ` - ` — segment separator (space-hyphen-space); may be omitted when the only credit is an arranger
+- Remaining segments — comma-separated artist/arranger names; `Arr.` prefix is preserved
+- A trailing ` (qualifier)` such as ` (bis)` is treated as part of the title, not the arranger name
 
 **Examples:**
 
 | Filename stem | Track # | Title | Artists |
 |---|---|---|---|
-| `05 Beauty and the Beast - Howard Ashman, Alan Menken - arr. Toshio Mashima` | 5 | Beauty and the Beast | Howard Ashman, Alan Menken, arr. Toshio Mashima |
+| `05 Beauty and the Beast - Howard Ashman, Alan Menken - Arr. Toshio Mashima` | 5 | Beauty and the Beast | Howard Ashman, Alan Menken, Arr. Toshio Mashima |
+| `08 ABBA GOLD, Arr. Ron Sebregts` | 8 | ABBA GOLD | Arr. Ron Sebregts |
+| `11 West Side Story - Leonard Bernstein, Arr. Naohiro Iwai (bis)` | 11 | West Side Story (bis) | Leonard Bernstein, Arr. Naohiro Iwai |
 | `Theme - Hans Zimmer` | — | Theme | Hans Zimmer |
 | `03 Interlude` | 3 | Interlude | — |
 
@@ -165,8 +170,11 @@ cp .env.example .env
 src/audioalchemy/
     cli.py              # Typer CLI entrypoint (convert, init-album)
     core/
-        converter.py    # AudioConverter abstract base class (stub)
-        metadata.py     # MetadataManager abstract base class (stub)
+        converter.py    # AudioConverter abstract base class
+        metadata.py     # MetadataManager abstract base class
+    adapters/
+        pydub_converter.py      # PydubConverter — audio conversion via ffmpeg
+        mutagen_metadata.py     # MutagenMetadataManager — tag reading/writing
     config/
         settings.py     # Pydantic-based settings loaded from env / .env
     services/
@@ -196,19 +204,13 @@ pytest --cov=audioalchemy
 
 ---
 
-## Implementation Status
+## Requirements
 
-| Component | Status |
-|---|---|
-| CLI (`convert`, `init-album`) | Done |
-| Configuration (Pydantic settings) | Done |
-| Rich logging | Done |
-| Audio file discovery | Done |
-| Album metadata loader (`_album.md`) | Done |
-| Filename parser | Done |
-| Pipeline orchestration & metadata merging | Done |
-| Audio format conversion (pydub) | Stub — TODO |
-| Metadata tag writing (mutagen) | Stub — TODO |
+Audio conversion requires **ffmpeg** installed and on PATH.
+
+- Windows: `winget install ffmpeg` or download from [ffmpeg.org](https://ffmpeg.org/download.html)
+- macOS: `brew install ffmpeg`
+- Linux: `apt install ffmpeg` / `dnf install ffmpeg`
 
 ---
 

@@ -11,6 +11,8 @@ TODO: Wire up concrete ``AudioConverter`` and ``MetadataManager`` implementation
 from pathlib import Path
 
 from audioalchemy.config.settings import Settings
+from audioalchemy.core.converter import AudioConverter
+from audioalchemy.core.metadata import MetadataManager
 from audioalchemy.utils.album_meta import load_album_meta
 from audioalchemy.utils.filename import parse_filename
 from audioalchemy.utils.filesystem import scan_directory
@@ -35,12 +37,19 @@ class ConversionPipeline:
         output_format: Target audio format for this run (e.g. ``"mp3"``).
     """
 
-    def __init__(self, settings: Settings, output_format: str) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        output_format: str,
+        converter: AudioConverter,
+        metadata_manager: MetadataManager,
+    ) -> None:
         self._settings = settings
         self._output_format = output_format
-        # TODO: Inject AudioConverter and MetadataManager once implemented.
+        self._converter = converter
+        self._metadata_manager = metadata_manager
 
-    def run(self, input_dir: Path, output_dir: Path) -> None:
+    def run(self, input_dir: Path, output_dir: Path, recursive: bool = False) -> None:
         """Execute the full batch conversion pipeline.
 
         Scans *input_dir* for supported audio files, parses filename metadata,
@@ -51,14 +60,14 @@ class ConversionPipeline:
         Args:
             input_dir: Directory containing source audio files.
             output_dir: Directory where converted files will be written.
-
-        TODO: Replace placeholder log statements with real conversion calls.
+            recursive: When ``True`` (default) sub-directories are included.
         """
         logger.info(
-            "Starting conversion pipeline — input=%s output=%s format=%s",
+            "Starting conversion pipeline — input=%s output=%s format=%s recursive=%s",
             input_dir,
             output_dir,
             self._output_format,
+            recursive,
         )
 
         album_meta = load_album_meta(input_dir)
@@ -67,7 +76,7 @@ class ConversionPipeline:
         else:
             logger.debug("No _album.md found in %s — album fields will be empty.", input_dir)
 
-        source_files = scan_directory(input_dir)
+        source_files = scan_directory(input_dir, recursive=recursive)
 
         if not source_files:
             logger.warning("No audio files found in %s", input_dir)
@@ -95,15 +104,15 @@ class ConversionPipeline:
                 metadata["artist"] = track_info.artists  # type: ignore[assignment]
 
             logger.info(
-                "[stub] %s → %s | track=%s title=%r artists=%s",
+                "%s → %s | track=%s title=%r artists=%s",
                 source.name,
                 destination.name,
                 track_info.track_number,
                 track_info.title,
                 track_info.artists,
             )
-            # TODO: destination.parent.mkdir(parents=True, exist_ok=True)
-            # TODO: converter.convert(source, destination, self._output_format)
-            # TODO: metadata_manager.write(destination, metadata)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            self._converter.convert(source, destination, self._output_format)
+            self._metadata_manager.write(destination, metadata)
 
-        logger.info("Pipeline complete. %d file(s) processed (stub).", len(source_files))
+        logger.info("Pipeline complete. %d file(s) processed.", len(source_files))
