@@ -41,3 +41,5 @@ Thumbs.db
 # Distribution
 *.whl
 *.tar.gz
+# CocoIndex Code (ccc)
+/.cocoindex_code/
