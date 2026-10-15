@@ -1,14 +1,24 @@
-# Python
+# CocoIndex Code (ccc): keep only the settings
+/.cocoindex_code/*
+!/.cocoindex_code/settings.yml
+
+# Python bytecode / extensions
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.so
+
+# Packaging / build output
+/build/
+/dist/
+.eggs/
 *.egg
 *.egg-info/
-dist/
-build/
-.eggs/
+*.whl
+*.tar.gz
+
+# Test / lint caches
 .cache/
 .mypy_cache/
 .ruff_cache/
@@ -22,24 +32,26 @@ coverage.xml
 venv/
 env/
 
-# Environment variables
-.env
+# Local environment (copy .env.example to .env)
+/.env
 
 # IDEs
 .vscode/
 .idea/
+.vs/
 *.sublime-project
 *.sublime-workspace
 
+# Local link to CONTRIBUTING.md for Claude Code (recreate: New-Item -ItemType SymbolicLink CLAUDE.md -Target CONTRIBUTING.md)
+/CLAUDE.md
+
+# Claude Code: local settings and skills, nothing to share yet
+/.claude/
+
+# Logs and crash dumps
+*.log
+*.stackdump
+
 # OS
-.DS_Store
 Thumbs.db
-
-# Tools
-.vexp/
-
-# Distribution
-*.whl
-*.tar.gz
-# CocoIndex Code (ccc)
-/.cocoindex_code/
+.DS_Store

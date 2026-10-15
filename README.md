@@ -6,15 +6,17 @@ A CLI tool for batch audio conversion and metadata management.
 
 ## Features
 
-- Batch audio file discovery (MP3, WAV, FLAC, OGG, AAC, M4A, WMA, OPUS)
+- Batch audio file discovery (input: MP3, WAV, FLAC, OGG, AAC, M4A, WMA, OPUS)
 - Album-level metadata via `_album.md` YAML frontmatter
 - Per-track metadata extraction from structured filenames
 - Pipeline orchestration with metadata merging
-- Audio format conversion via pydub / ffmpeg
-- Metadata tag writing (ID3 for MP3, VorbisComment for FLAC/OGG)
+- Audio format conversion via pydub / ffmpeg (output: MP3, WAV, FLAC, OGG, AAC)
+- Metadata tag writing: ID3 for MP3, Vorbis-style tags for other formats (see [Limitations](#limitations))
 - `init-album` command to scaffold album metadata templates
 - Structured logging with Rich output
 - Environment-based configuration via Pydantic settings
+
+**Status:** pre-alpha (`0.1.0`). Both CLI commands are implemented end to end.
 
 ---
 
@@ -89,7 +91,7 @@ audioalchemy init-album ./music --force
 
 ## Album Metadata (`_album.md`)
 
-Place a `_album.md` file in any audio directory to define shared album-level metadata. The pipeline automatically loads it and merges the fields into every track in that directory.
+Place a `_album.md` file in the **root of `INPUT_DIR`** to define shared album-level metadata. The pipeline loads it once per run and merges the fields into every converted track (including tracks in sub-directories when `--recursive` is used). `_album.md` files inside sub-directories are not read.
 
 **Format:** YAML frontmatter between `---` delimiters, followed by optional freeform notes (ignored).
 
@@ -116,7 +118,11 @@ Any freeform text here is ignored by the parser.
 | `genre` | Genre |
 | `comment` | Free-form comment |
 
-Any extra keys are captured and passed through as additional metadata fields.
+`year` is accepted as a legacy alias for `date` (used only when `date` is absent).
+
+Any extra keys are captured and passed to the tag writer. For MP3 output only the standard fields above (plus title, artist and track number from the filename) are written; unknown keys are skipped. For other formats they are written as tags with the lower-cased key name.
+
+Track-level values from the filename (`title`, `artist`, `tracknumber`) override album-level values. Multiple artists are joined with ` / ` in ID3 tags and stored as multiple values in Vorbis-style tags.
 
 Use `audioalchemy init-album <dir>` to generate a blank template.
 
@@ -201,6 +207,18 @@ pytest
 # Run with coverage
 pytest --cov=audioalchemy
 ```
+
+Current tests cover the CLI (`test_cli.py`), the `_album.md` loader (`test_album_meta.py`) and the filename parser (`test_filename.py`). There are no dedicated tests for `PydubConverter`, `MutagenMetadataManager` or `ConversionPipeline`.
+
+---
+
+## Limitations
+
+- Tag writing is implemented for MP3 (ID3) and generic Vorbis-style tags. Tagging of WAV and AAC output is not specifically handled or tested.
+- Input files in M4A, WMA and OPUS are discovered and decoded through ffmpeg, but they cannot be chosen as output formats.
+- The pipeline has no per-file error handling: an unreadable or undecodable file raises and aborts the run.
+- Conversion settings such as bitrate or sample rate are not configurable; pydub/ffmpeg defaults are used.
+- Only `AUDIOALCHEMY_DEFAULT_FORMAT` and `AUDIOALCHEMY_LOG_LEVEL` are configurable.
 
 ---
 
