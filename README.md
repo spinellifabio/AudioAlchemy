@@ -1,5 +1,15 @@
 # AudioAlchemy
 
+![GitHub Repo stars](https://img.shields.io/github/stars/spinellifabio/AudioAlchemy)
+![Last Commit](https://img.shields.io/github/last-commit/spinellifabio/AudioAlchemy)
+![Issues](https://img.shields.io/github/issues/spinellifabio/AudioAlchemy)
+
+![Python](https://img.shields.io/badge/language-Python%203.11%2B-3776AB.svg)
+![CLI](https://img.shields.io/badge/type-CLI-555.svg)
+![ffmpeg](https://img.shields.io/badge/requires-ffmpeg-007808.svg)
+![coverage](https://img.shields.io/badge/coverage-77%25-yellow)
+![version](https://img.shields.io/github/v/tag/spinellifabio/AudioAlchemy)
+
 A CLI tool for batch audio conversion and metadata management.
 
 ---
@@ -232,6 +242,21 @@ Audio conversion requires **ffmpeg** installed and on PATH.
 
 ---
 
-## License
+## Credits
 
-MIT
+```text
+  ______                   __  __             ______   __            __
+ ╱      ╲                 ╱  │╱  │           ╱      ╲ ╱  │          ╱  │
+╱$$$$$$  │ __    __   ____$$ │$$╱   ______  ╱$$$$$$  │$$ │  _______ $$ │____    ______   _____  ____   __    __
+$$ │__$$ │╱  │  ╱  │ ╱    $$ │╱  │ ╱      ╲ $$ │__$$ │$$ │ ╱       │$$      ╲  ╱      ╲ ╱     ╲╱    ╲ ╱  │  ╱  │
+$$    $$ │$$ │  $$ │╱$$$$$$$ │$$ │╱$$$$$$  │$$    $$ │$$ │╱$$$$$$$╱ $$$$$$$  │╱$$$$$$  │$$$$$$ $$$$  │$$ │  $$ │
+$$$$$$$$ │$$ │  $$ │$$ │  $$ │$$ │$$ │  $$ │$$$$$$$$ │$$ │$$ │      $$ │  $$ │$$    $$ │$$ │ $$ │ $$ │$$ │  $$ │
+$$ │  $$ │$$ ╲__$$ │$$ ╲__$$ │$$ │$$ ╲__$$ │$$ │  $$ │$$ │$$ ╲_____ $$ │  $$ │$$$$$$$$╱ $$ │ $$ │ $$ │$$ ╲__$$ │
+$$ │  $$ │$$    $$╱ $$    $$ │$$ │$$    $$╱ $$ │  $$ │$$ │$$       │$$ │  $$ │$$       │$$ │ $$ │ $$ │$$    $$ │
+$$╱   $$╱  $$$$$$╱   $$$$$$$╱ $$╱  $$$$$$╱  $$╱   $$╱ $$╱  $$$$$$$╱ $$╱   $$╱  $$$$$$$╱ $$╱  $$╱  $$╱  $$$$$$$ │
+                                                                                                      ╱  ╲__$$ │
+                                                                                                      $$    $$╱
+                                                                                                       $$$$$$╱
+
+                                                                  v1.0.0 - Code assembled in spare time by Fabio
+```
