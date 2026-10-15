@@ -32,11 +32,21 @@ A CLI tool for batch audio conversion and metadata management.
 
 ## Installation
 
-Requires Python 3.11+.
+Requires Python 3.11+ and [ffmpeg](https://ffmpeg.org/) on PATH.
+
+### As a command-line tool
+
+```bash
+pipx install git+https://github.com/spinellifabio/AudioAlchemy.git@v0.1.0
+```
+
+`pip install` with the same URL works too, but `pipx` keeps the tool in its own environment.
+
+### From source (development)
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/spinellifabio/AudioAlchemy.git
 cd AudioAlchemy
 
 # Create a virtual environment
