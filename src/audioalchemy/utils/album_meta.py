@@ -8,7 +8,7 @@ File format::
 
     ---
     album: "Wind Ensemble Classics"
-    year: "2024"
+    date: "2024"
     album_artist: "Tokyo Wind Ensemble"
     genre: "Classical"
     comment: "Recorded live at Suntory Hall"
@@ -44,14 +44,14 @@ class AlbumMeta:
 
     Attributes:
         album: Album title.
-        year: Release year (stored as string to preserve formatting).
+        date: Release date (stored as string to preserve formatting).
         album_artist: Primary artist credited to the album as a whole.
         genre: Musical genre.
         comment: Freeform comment written to the comment tag of every track.
     """
 
     album: str = ""
-    year: str = ""
+    date: str = ""
     album_artist: str = ""
     genre: str = ""
     comment: str = ""
@@ -64,7 +64,7 @@ class AlbumMeta:
         *extra* are also included.
         """
         record: dict[str, str] = {}
-        for key in ("album", "year", "album_artist", "genre", "comment"):
+        for key in ("album", "date", "album_artist", "genre", "comment"):
             value = getattr(self, key)
             if value:
                 record[key] = value
@@ -100,12 +100,12 @@ def load_album_meta(directory: Path) -> AlbumMeta | None:
     except yaml.YAMLError as exc:
         raise ValueError(f"Invalid YAML frontmatter in {md_path}: {exc}") from exc
 
-    known = {"album", "year", "album_artist", "genre", "comment"}
+    known = {"album", "date", "year", "album_artist", "genre", "comment"}
     extra = {k: str(v) for k, v in data.items() if k not in known and v is not None}
 
     return AlbumMeta(
         album=str(data.get("album") or ""),
-        year=str(data.get("year") or ""),
+        date=str(data.get("date") or data.get("year") or ""),
         album_artist=str(data.get("album_artist") or ""),
         genre=str(data.get("genre") or ""),
         comment=str(data.get("comment") or ""),
@@ -116,7 +116,7 @@ def load_album_meta(directory: Path) -> AlbumMeta | None:
 ALBUM_MD_TEMPLATE = """\
 ---
 album: ""
-year: ""
+date: ""
 album_artist: ""
 genre: ""
 comment: ""

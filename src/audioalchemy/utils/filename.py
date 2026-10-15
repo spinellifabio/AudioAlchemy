@@ -31,6 +31,15 @@ from dataclasses import dataclass, field
 # Matches an optional leading track number: one or more digits followed by a space.
 _TRACK_NUMBER_RE = re.compile(r"^(\d+)\s+(.+)$")
 
+# Matches arranger credit embedded directly in the title after a comma, e.g.
+# "ABBA GOLD, Arr. Ron Sebregts" — used when there is no ' - ' separator.
+_EMBEDDED_ARR_RE = re.compile(r",\s+([Aa]rr\..+)$")
+
+# Matches a trailing performance qualifier in the last artist field, e.g. " (bis)".
+# Requires a space before the opening paren so it does not match identifiers like
+# "Arr. Bittmar(01)" where the paren is part of the name.
+_TRAILING_QUALIFIER_RE = re.compile(r"\s+\([^)]+\)$")
+
 
 @dataclass
 class TrackInfo:
@@ -80,5 +89,24 @@ def parse_filename(stem: str) -> TrackInfo:
             name = raw_name.strip()
             if name:
                 artists.append(name)
+
+    # Fallback: arranger credit embedded in the title without a ' - ' separator,
+    # e.g. "ABBA GOLD, Arr. Ron Sebregts". Split at the first ', Arr.' occurrence.
+    if not artists:
+        arr_match = _EMBEDDED_ARR_RE.search(title)
+        if arr_match:
+            title = title[: arr_match.start()].strip()
+            for raw_name in arr_match.group(1).split(","):
+                name = raw_name.strip()
+                if name:
+                    artists.append(name)
+
+    # A trailing " (qualifier)" on the last artist (e.g. " (bis)") belongs to the
+    # track title, not the artist name. Move it back to the title.
+    if artists:
+        q_match = _TRAILING_QUALIFIER_RE.search(artists[-1])
+        if q_match:
+            artists[-1] = artists[-1][: q_match.start()]
+            title = title + q_match.group(0)
 
     return TrackInfo(title=title, artists=artists, track_number=track_number)

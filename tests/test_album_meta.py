@@ -18,7 +18,7 @@ class TestLoadAlbumMeta:
         (tmp_path / ALBUM_MD_FILENAME).write_text(
             "---\n"
             "album: Wind Ensemble Classics\n"
-            "year: '2024'\n"
+            "date: '2024-04-11'\n"
             "album_artist: Tokyo Wind Ensemble\n"
             "genre: Classical\n"
             "comment: Recorded live\n"
@@ -28,10 +28,27 @@ class TestLoadAlbumMeta:
         meta = load_album_meta(tmp_path)
         assert meta is not None
         assert meta.album == "Wind Ensemble Classics"
-        assert meta.year == "2024"
+        assert meta.date == "2024-04-11"
         assert meta.album_artist == "Tokyo Wind Ensemble"
         assert meta.genre == "Classical"
         assert meta.comment == "Recorded live"
+
+    def test_year_accepted_as_date_fallback(self, tmp_path):
+        (tmp_path / ALBUM_MD_FILENAME).write_text(
+            "---\nalbum: Test\nyear: '2024'\n---\n", encoding="utf-8"
+        )
+        meta = load_album_meta(tmp_path)
+        assert meta is not None
+        assert meta.date == "2024"
+        assert "year" not in meta.extra
+
+    def test_date_takes_precedence_over_year(self, tmp_path):
+        (tmp_path / ALBUM_MD_FILENAME).write_text(
+            "---\nalbum: Test\ndate: '2026-04-11'\nyear: '2024'\n---\n", encoding="utf-8"
+        )
+        meta = load_album_meta(tmp_path)
+        assert meta is not None
+        assert meta.date == "2026-04-11"
 
     def test_extra_fields_captured(self, tmp_path):
         (tmp_path / ALBUM_MD_FILENAME).write_text(
@@ -48,7 +65,7 @@ class TestLoadAlbumMeta:
         )
         meta = load_album_meta(tmp_path)
         assert meta is not None
-        assert meta.year == ""
+        assert meta.date == ""
         assert meta.genre == ""
 
     def test_file_without_frontmatter_returns_empty_meta(self, tmp_path):
@@ -78,20 +95,20 @@ class TestLoadAlbumMeta:
 
 class TestAlbumMetaToMetadataRecord:
     def test_empty_fields_excluded(self):
-        meta = AlbumMeta(album="Test", year="", genre="")
+        meta = AlbumMeta(album="Test", date="", genre="")
         record = meta.to_metadata_record()
         assert "album" in record
-        assert "year" not in record
+        assert "date" not in record
         assert "genre" not in record
 
     def test_all_fields_included_when_set(self):
         meta = AlbumMeta(
-            album="A", year="2020", album_artist="B", genre="Jazz", comment="C"
+            album="A", date="2020-06-15", album_artist="B", genre="Jazz", comment="C"
         )
         record = meta.to_metadata_record()
         assert record == {
             "album": "A",
-            "year": "2020",
+            "date": "2020-06-15",
             "album_artist": "B",
             "genre": "Jazz",
             "comment": "C",
@@ -105,7 +122,7 @@ class TestAlbumMetaToMetadataRecord:
 
 class TestAlbumMdTemplate:
     def test_template_has_required_keys(self):
-        for key in ("album", "year", "album_artist", "genre", "comment"):
+        for key in ("album", "date", "album_artist", "genre", "comment"):
             assert key in ALBUM_MD_TEMPLATE
 
     def test_template_has_frontmatter_delimiters(self):
