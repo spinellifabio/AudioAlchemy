@@ -45,8 +45,14 @@ env/
 # Local link to CONTRIBUTING.md for Claude Code (recreate: New-Item -ItemType SymbolicLink CLAUDE.md -Target CONTRIBUTING.md)
 /CLAUDE.md
 
-# Claude Code: local settings and skills, nothing to share yet
+# Claude Code: skills are third-party and regenerable (specify init), nothing to share yet
 /.claude/
+
+# Spec Kit: track only the constitution; scripts/templates/integrations come from the Specify CLI
+/.specify/*
+!/.specify/memory/
+/.specify/memory/*
+!/.specify/memory/constitution.md
 
 # Logs and crash dumps
 *.log
