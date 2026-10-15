@@ -29,6 +29,7 @@ dependencies = [
     "python-dotenv>=1.0",
     "rich>=13.0",
     "pydub>=0.25",
+    "audioop-lts>=0.2; python_version >= '3.13'",
     "mutagen>=1.47",
     "PyYAML>=6.0",
 ]
