@@ -1,3 +1,4 @@
+import logging
 import shutil
 from pathlib import Path
 
@@ -118,9 +119,11 @@ def test_wav_output_with_tags(tmp_path):
 
 
 @needs_ffmpeg
-def test_aac_output(tmp_path):
+def test_aac_output(tmp_path, caplog):
     src, out = tmp_path / "in", tmp_path / "out"
     _wav(src / "a.wav")
-    result = CliRunner().invoke(app, ["convert", str(src), str(out), "-f", "aac"])
+    with caplog.at_level(logging.WARNING, logger="audioalchemy.adapters.mutagen_metadata"):
+        result = CliRunner().invoke(app, ["convert", str(src), str(out), "-f", "aac"])
     assert result.exit_code == 0, result.output
     assert (out / "a.aac").stat().st_size > 0
+    assert "cannot store tags" in caplog.text
