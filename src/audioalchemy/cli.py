@@ -88,8 +88,8 @@ def convert(
         raise typer.Exit(code=1)
 
     console.print(
-        f"[bold green]AudioAlchemy[/bold green] · converting "
-        f"[cyan]{input_dir}[/cyan] → [cyan]{output_dir}[/cyan] "
+        f"[bold green]AudioAlchemy[/bold green] - converting "
+        f"[cyan]{input_dir}[/cyan] -> [cyan]{output_dir}[/cyan] "
         f"([bold]{output_format}[/bold])"
     )
 
