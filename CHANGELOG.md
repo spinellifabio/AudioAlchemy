@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### 🐛 Bug Fixes
+
+- *(adapters)* Tag WAV output and write AAC as ADTS ([`8e25c54`](https://github.com/spinellifabio/AudioAlchemy/commit/8e25c54a398d2d3a34e485593e2f86904426d110))
+- *(cli)* Use ascii in log and console messages ([`fdb2571`](https://github.com/spinellifabio/AudioAlchemy/commit/fdb2571d686c49ffe984c1045ac3a64f32772461))
+
+### 📚 Documentation
+
+- *(readme)* Fix tag contract for WAV and AAC output ([`ee5bae2`](https://github.com/spinellifabio/AudioAlchemy/commit/ee5bae20707ad5d0cd3347aeaeee26e439313386))
+- Rewrite contributing, add code of conduct and changelog ([`1cfab37`](https://github.com/spinellifabio/AudioAlchemy/commit/1cfab37c41987d6fb9fa7495c445611808540d66))
+
+### 🧪 Testing
+
+- Assert AAC untagged warning in pipeline test ([`52e8b6f`](https://github.com/spinellifabio/AudioAlchemy/commit/52e8b6f1c7449601585e7fe704d0ca109d5cdce6))
+- Cover WAV tagging and AAC output, update README ([`c28d3ee`](https://github.com/spinellifabio/AudioAlchemy/commit/c28d3eeba9f6377bef736813ecab05712bf1b2c4))
+- Add pipeline and end-to-end conversion tests ([`889a984`](https://github.com/spinellifabio/AudioAlchemy/commit/889a984a193154305ad5628e44c258e95314fb1a))
+
+### ⚙️ Miscellaneous Tasks
+
+- Add ci, github templates, ruff config and adapter tests ([`0c47e67`](https://github.com/spinellifabio/AudioAlchemy/commit/0c47e6748834eb508fff9acae362bdbd1b86041d))
+
 ## [0.1.0] - 2026-10-15
 
 ### 🚀 Features
