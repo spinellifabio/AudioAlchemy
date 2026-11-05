@@ -7,7 +7,7 @@
 ![Python](https://img.shields.io/badge/language-Python%203.11%2B-3776AB.svg)
 ![CLI](https://img.shields.io/badge/type-CLI-555.svg)
 ![ffmpeg](https://img.shields.io/badge/requires-ffmpeg-007808.svg)
-![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
+![coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)
 ![version](https://img.shields.io/github/v/tag/spinellifabio/AudioAlchemy)
 
 A CLI tool for batch audio conversion and metadata management.
@@ -20,7 +20,7 @@ A CLI tool for batch audio conversion and metadata management.
 - Album-level metadata via `_album.md` YAML frontmatter
 - Per-track metadata extraction from structured filenames
 - Pipeline orchestration with metadata merging
-- Audio format conversion via pydub / ffmpeg (output: MP3, WAV, FLAC, OGG, AAC)
+- Audio format conversion via pydub / ffmpeg (output: MP3, FLAC, OGG; WAV and AAC are listed but broken, see [Limitations](#limitations))
 - Metadata tag writing: ID3 for MP3, Vorbis-style tags for other formats (see [Limitations](#limitations))
 - `init-album` command to scaffold album metadata templates
 - Structured logging with Rich output
@@ -231,7 +231,7 @@ pytest --cov=audioalchemy
 ruff check src tests
 ```
 
-Tests cover the CLI (`test_cli.py`, with the converter and tag writer mocked), the `_album.md` loader (`test_album_meta.py`), the filename parser (`test_filename.py`) and the adapters (`test_adapters.py`). Overall coverage is 92%. CI runs lint and tests on Python 3.11-3.13.
+Tests cover the CLI (`test_cli.py`, with the converter and tag writer mocked), the `_album.md` loader (`test_album_meta.py`), the filename parser (`test_filename.py`) and the adapters (`test_adapters.py`) and the pipeline plus real ffmpeg conversions (`test_pipeline.py`). Overall coverage is 94%. CI runs lint and tests on Python 3.11-3.13.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and [CHANGELOG.md](CHANGELOG.md) for release notes.
 
@@ -239,15 +239,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and [CHANGELOG.md](CHANG
 
 ## Tested and not tested
 
-- Tested: WAV to WAV conversion, decode and format errors, MP3 (ID3) and FLAC (Vorbis) tag writing, CLI flow with mocked adapters, `_album.md` loading, filename parsing.
+- Tested: end-to-end `convert` (recursive and flat) to MP3, FLAC and OGG with tags, M4A/OPUS/WMA input, decode and format errors, metadata merging, `_album.md` loading, filename parsing.
 - Tag tests that need ffmpeg are skipped when it is not on PATH (CI installs ffmpeg, so they run there).
-- Not tested: end-to-end `convert` on a real directory, OGG/AAC output, WAV/AAC tagging, M4A/WMA/OPUS input.
+- Known failing (strict `xfail` tests): WAV output aborts when writing tags, AAC output is rejected by ffmpeg.
 
 ---
 
 ## Limitations
 
-- Tag writing is implemented for MP3 (ID3) and generic Vorbis-style tags. Tagging of WAV and AAC output is not specifically handled or tested.
+- Tag writing works for MP3 (ID3) and Vorbis-style tags (FLAC, OGG). WAV output fails with `TypeError: ['5'] not a Frame instance` while tagging, and AAC output fails in ffmpeg (`Invalid argument`); both abort the run.
 - Input files in M4A, WMA and OPUS are discovered and decoded through ffmpeg, but they cannot be chosen as output formats.
 - The pipeline has no per-file error handling: an unreadable or undecodable file raises and aborts the run.
 - Conversion settings such as bitrate or sample rate are not configurable; pydub/ffmpeg defaults are used.
