@@ -7,7 +7,7 @@
 ![Python](https://img.shields.io/badge/language-Python%203.11%2B-3776AB.svg)
 ![CLI](https://img.shields.io/badge/type-CLI-555.svg)
 ![ffmpeg](https://img.shields.io/badge/requires-ffmpeg-007808.svg)
-![coverage](https://img.shields.io/badge/coverage-77%25-yellow)
+![coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)
 ![version](https://img.shields.io/github/v/tag/spinellifabio/AudioAlchemy)
 
 A CLI tool for batch audio conversion and metadata management.
@@ -226,9 +226,22 @@ pytest
 
 # Run with coverage
 pytest --cov=audioalchemy
+
+# Lint
+ruff check src tests
 ```
 
-Current tests cover the CLI (`test_cli.py`), the `_album.md` loader (`test_album_meta.py`) and the filename parser (`test_filename.py`). There are no dedicated tests for `PydubConverter`, `MutagenMetadataManager` or `ConversionPipeline`.
+Tests cover the CLI (`test_cli.py`, with the converter and tag writer mocked), the `_album.md` loader (`test_album_meta.py`), the filename parser (`test_filename.py`) and the adapters (`test_adapters.py`). Overall coverage is 92%. CI runs lint and tests on Python 3.11-3.13.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and [CHANGELOG.md](CHANGELOG.md) for release notes.
+
+---
+
+## Tested and not tested
+
+- Tested: WAV to WAV conversion, decode and format errors, MP3 (ID3) and FLAC (Vorbis) tag writing, CLI flow with mocked adapters, `_album.md` loading, filename parsing.
+- Tag tests that need ffmpeg are skipped when it is not on PATH (CI installs ffmpeg, so they run there).
+- Not tested: end-to-end `convert` on a real directory, OGG/AAC output, WAV/AAC tagging, M4A/WMA/OPUS input.
 
 ---
 
@@ -268,5 +281,5 @@ $$╱   $$╱  $$$$$$╱   $$$$$$$╱ $$╱  $$$$$$╱  $$╱   $$╱ $$╱  $$$
                                                                                                       $$    $$╱
                                                                                                        $$$$$$╱
 
-                                                                  v1.0.0 - Code assembled in spare time by Fabio
+                                                                  v0.1.0 - Code assembled in spare time by Fabio
 ```
