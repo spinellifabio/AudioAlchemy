@@ -35,4 +35,6 @@ class PydubConverter(AudioConverter):
                 f"Could not decode {source.name}. "
                 "Ensure ffmpeg is installed and on PATH."
             ) from exc
-        audio.export(str(destination), format=output_format)
+        # pydub passes the format to ffmpeg -f; raw "aac" is not a valid muxer, ADTS is.
+        container = "adts" if output_format == "aac" else output_format
+        audio.export(str(destination), format=container)

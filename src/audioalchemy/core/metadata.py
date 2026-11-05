@@ -10,7 +10,6 @@ TODO: Implement ``MutagenMetadataManager`` using ``mutagen.File``.
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-
 # A metadata record is a plain dict of tag-name → value pairs.
 # Values are strings for simplicity; multi-value tags use a list of strings.
 MetadataRecord = dict[str, str | list[str]]

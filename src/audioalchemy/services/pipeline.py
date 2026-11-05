@@ -63,7 +63,7 @@ class ConversionPipeline:
             recursive: When ``True`` (default) sub-directories are included.
         """
         logger.info(
-            "Starting conversion pipeline — input=%s output=%s format=%s recursive=%s",
+            "Starting conversion pipeline: input=%s output=%s format=%s recursive=%s",
             input_dir,
             output_dir,
             self._output_format,
@@ -74,7 +74,7 @@ class ConversionPipeline:
         if album_meta is not None:
             logger.info("Loaded album metadata from _album.md: album=%r", album_meta.album)
         else:
-            logger.debug("No _album.md found in %s — album fields will be empty.", input_dir)
+            logger.debug("No _album.md found in %s; album fields will be empty.", input_dir)
 
         source_files = scan_directory(input_dir, recursive=recursive)
 
@@ -104,7 +104,7 @@ class ConversionPipeline:
                 metadata["artist"] = track_info.artists  # type: ignore[assignment]
 
             logger.info(
-                "%s → %s | track=%s title=%r artists=%s",
+                "%s -> %s | track=%s title=%r artists=%s",
                 source.name,
                 destination.name,
                 track_info.track_number,

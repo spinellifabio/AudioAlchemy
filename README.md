@@ -7,7 +7,7 @@
 ![Python](https://img.shields.io/badge/language-Python%203.11%2B-3776AB.svg)
 ![CLI](https://img.shields.io/badge/type-CLI-555.svg)
 ![ffmpeg](https://img.shields.io/badge/requires-ffmpeg-007808.svg)
-![coverage](https://img.shields.io/badge/coverage-77%25-yellow)
+![coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)
 ![version](https://img.shields.io/github/v/tag/spinellifabio/AudioAlchemy)
 
 A CLI tool for batch audio conversion and metadata management.
@@ -21,12 +21,12 @@ A CLI tool for batch audio conversion and metadata management.
 - Per-track metadata extraction from structured filenames
 - Pipeline orchestration with metadata merging
 - Audio format conversion via pydub / ffmpeg (output: MP3, WAV, FLAC, OGG, AAC)
-- Metadata tag writing: ID3 for MP3, Vorbis-style tags for other formats (see [Limitations](#limitations))
+- Metadata tag writing: ID3 for MP3 and WAV, Vorbis-style tags for FLAC and OGG (AAC output is untagged, see [Limitations](#limitations))
 - `init-album` command to scaffold album metadata templates
 - Structured logging with Rich output
 - Environment-based configuration via Pydantic settings
 
-**Status:** pre-alpha (`0.1.0`). Both CLI commands are implemented end to end.
+**Status:** pre-alpha (`0.1.1`). Both CLI commands are implemented end to end.
 
 ---
 
@@ -37,7 +37,7 @@ Requires Python 3.11+ and [ffmpeg](https://ffmpeg.org/) on PATH.
 ### As a command-line tool
 
 ```bash
-pipx install git+https://github.com/spinellifabio/AudioAlchemy.git@v0.1.0
+pipx install git+https://github.com/spinellifabio/AudioAlchemy.git@v0.1.1
 ```
 
 `pip install` with the same URL works too, but `pipx` keeps the tool in its own environment.
@@ -140,7 +140,7 @@ Any freeform text here is ignored by the parser.
 
 `year` is accepted as a legacy alias for `date` (used only when `date` is absent).
 
-Any extra keys are captured and passed to the tag writer. For MP3 output only the standard fields above (plus title, artist and track number from the filename) are written; unknown keys are skipped. For other formats they are written as tags with the lower-cased key name.
+Any extra keys are captured and passed to the tag writer. For MP3 and WAV output only the standard fields above (plus title, artist and track number from the filename) are written; unknown keys are skipped. For FLAC and OGG they are written as tags with the lower-cased key name. AAC output is untagged.
 
 Track-level values from the filename (`title`, `artist`, `tracknumber`) override album-level values. Multiple artists are joined with ` / ` in ID3 tags and stored as multiple values in Vorbis-style tags.
 
@@ -214,6 +214,8 @@ tests/
     test_cli.py
     test_album_meta.py
     test_filename.py
+    test_adapters.py
+    test_pipeline.py
 ```
 
 ---
@@ -226,15 +228,28 @@ pytest
 
 # Run with coverage
 pytest --cov=audioalchemy
+
+# Lint
+ruff check src tests
 ```
 
-Current tests cover the CLI (`test_cli.py`), the `_album.md` loader (`test_album_meta.py`) and the filename parser (`test_filename.py`). There are no dedicated tests for `PydubConverter`, `MutagenMetadataManager` or `ConversionPipeline`.
+Tests cover the CLI (`test_cli.py`, with the converter and tag writer mocked), the `_album.md` loader (`test_album_meta.py`), the filename parser (`test_filename.py`) and the adapters (`test_adapters.py`) and the pipeline plus real ffmpeg conversions (`test_pipeline.py`). Overall coverage is 94%. CI runs lint and tests on Python 3.11-3.13.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and [CHANGELOG.md](CHANGELOG.md) for release notes.
+
+---
+
+## Tested and not tested
+
+- Tested: end-to-end `convert` (recursive and flat) to MP3, WAV, FLAC and OGG with tags, AAC output, M4A/OPUS/WMA input, decode and format errors, metadata merging, `_album.md` loading, filename parsing.
+- Tag tests that need ffmpeg are skipped when it is not on PATH (CI installs ffmpeg, so they run there).
+- Not tested: anything beyond short generated silence (real music, long files, non-ASCII filenames).
 
 ---
 
 ## Limitations
 
-- Tag writing is implemented for MP3 (ID3) and generic Vorbis-style tags. Tagging of WAV and AAC output is not specifically handled or tested.
+- Tag writing works for MP3 and WAV (ID3) and for FLAC and OGG (Vorbis-style). AAC output is written as a raw ADTS stream, which has no tag container, so it is converted but left untagged (a warning is logged).
 - Input files in M4A, WMA and OPUS are discovered and decoded through ffmpeg, but they cannot be chosen as output formats.
 - The pipeline has no per-file error handling: an unreadable or undecodable file raises and aborts the run.
 - Conversion settings such as bitrate or sample rate are not configurable; pydub/ffmpeg defaults are used.
@@ -268,5 +283,5 @@ $$╱   $$╱  $$$$$$╱   $$$$$$$╱ $$╱  $$$$$$╱  $$╱   $$╱ $$╱  $$$
                                                                                                       $$    $$╱
                                                                                                        $$$$$$╱
 
-                                                                  v1.0.0 - Code assembled in spare time by Fabio
+                                                                  v0.1.1 - Code assembled in spare time by Fabio
 ```

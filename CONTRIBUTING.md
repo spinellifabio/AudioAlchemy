@@ -1,33 +1,41 @@
-# AudioAlchemy
+# Contributing to AudioAlchemy
 
-Python 3.11+ CLI for batch audio conversion and metadata tagging (pydub/ffmpeg + mutagen). Pre-alpha
-`0.1.0`; `convert` and `init-album` work end to end. Features, usage, limitations: `README.md`.
+Thanks for helping out. Bug reports and pull requests are welcome.
 
-## Read first
-- `README.md` is the source of truth for behavior and limitations. Keep it in line with the code;
-  document only what is implemented and verified.
-- Some docstrings in `core/` and `services/pipeline.py` still say "TODO / not yet wired" but the
-  implementations exist. Trust the code, fix the docstring when touching the file.
+## Setup
 
-## Architecture
-- Layers: `cli.py` (Typer, args and output only) → `services/pipeline.py` (`ConversionPipeline`) →
-  `core/` abstract interfaces (`AudioConverter`, `MetadataManager`) ← `adapters/` (pydub, mutagen).
-- `utils/`: `filesystem` (scan), `filename` (track parser), `album_meta` (`_album.md` loader),
-  `logging`. `config/settings.py`: Pydantic settings, env prefix `AUDIOALCHEMY_`.
-- No business logic in the CLI. New backends implement the `core/` interfaces.
-- Filename convention and `_album.md` format are user-facing contracts: change them together with
-  `README.md` and tests.
-
-## Commands
-```
-python -m venv .venv && .venv\Scripts\activate
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
+```
+
+Conversion needs [ffmpeg](https://ffmpeg.org/) on PATH.
+
+## Checks
+
+```bash
+ruff check src tests
 pytest
 ```
-Conversion needs `ffmpeg` on PATH. Tests cover CLI, `_album.md` loader and filename parser only;
-adapters and pipeline have none yet.
 
-## Conventions
-- Match the surrounding style: type hints, short docstrings, `get_logger(__name__)` for logging.
-- Comments minimal, only for the why, in a plain human voice.
-- Commits: Conventional Commits; ask before committing.
+CI runs both on Python 3.11, 3.12 and 3.13.
+
+## Code layout
+
+`cli.py` (Typer, args and output only) calls `services/pipeline.py`, which uses the abstract
+interfaces in `core/` implemented by `adapters/` (pydub, mutagen). Keep business logic out of the CLI;
+new backends implement the `core/` interfaces. See the Project Structure section of `README.md`.
+
+The filename convention and the `_album.md` format are user-facing contracts: change them together
+with `README.md` and tests.
+
+## Workflow
+
+- Git Flow: branch from `develop` as `feature/<name>`, open the PR against `develop`.
+  Hotfixes branch from `main`.
+- Commits follow [Conventional Commits](https://www.conventionalcommits.org) (`feat`, `fix`,
+  `refactor`, `docs`, `perf`, `chore`). Subjects feed the changelog.
+- The changelog is generated with [git-cliff](https://git-cliff.org) from `cliff.toml`:
+  `git cliff -o CHANGELOG.md`. Commits scoped `changelog` are excluded.
+- Update `README.md` when behavior changes, and document only what is implemented and verified.
