@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.1.1] - 2026-11-05
 
 ### 🐛 Bug Fixes
 
@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
+- *(release)* Bump version to 0.1.1 ([`02b8c93`](https://github.com/spinellifabio/AudioAlchemy/commit/02b8c93022f1fad2b7e733fcfaee02808c245c52))
 - Add ci, github templates, ruff config and adapter tests ([`0c47e67`](https://github.com/spinellifabio/AudioAlchemy/commit/0c47e6748834eb508fff9acae362bdbd1b86041d))
 
 ## [0.1.0] - 2026-10-15
