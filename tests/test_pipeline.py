@@ -6,6 +6,7 @@ import pytest
 from pydub import AudioSegment
 from typer.testing import CliRunner
 
+from audioalchemy.adapters.mutagen_metadata import MutagenMetadataManager
 from audioalchemy.cli import app
 from audioalchemy.config.settings import Settings
 from audioalchemy.core.converter import AudioConverter
@@ -108,18 +109,18 @@ def test_non_default_input_formats_are_decoded(tmp_path, ext, fmt):
 
 
 @needs_ffmpeg
-@pytest.mark.xfail(strict=True, reason="WAV tagging crashes: ID3 frames get list values")
 def test_wav_output_with_tags(tmp_path):
     src, out = tmp_path / "in", tmp_path / "out"
     _wav(src / "05 Song - Art.wav")
     result = CliRunner().invoke(app, ["convert", str(src), str(out), "-f", "wav"])
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
+    assert MutagenMetadataManager().read(out / "05 Song - Art.wav")["title"] == "Song"
 
 
 @needs_ffmpeg
-@pytest.mark.xfail(strict=True, reason="pydub format 'aac' is rejected by ffmpeg")
 def test_aac_output(tmp_path):
     src, out = tmp_path / "in", tmp_path / "out"
     _wav(src / "a.wav")
     result = CliRunner().invoke(app, ["convert", str(src), str(out), "-f", "aac"])
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
+    assert (out / "a.aac").stat().st_size > 0

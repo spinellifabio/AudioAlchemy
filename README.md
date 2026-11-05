@@ -20,8 +20,8 @@ A CLI tool for batch audio conversion and metadata management.
 - Album-level metadata via `_album.md` YAML frontmatter
 - Per-track metadata extraction from structured filenames
 - Pipeline orchestration with metadata merging
-- Audio format conversion via pydub / ffmpeg (output: MP3, FLAC, OGG; WAV and AAC are listed but broken, see [Limitations](#limitations))
-- Metadata tag writing: ID3 for MP3, Vorbis-style tags for other formats (see [Limitations](#limitations))
+- Audio format conversion via pydub / ffmpeg (output: MP3, WAV, FLAC, OGG, AAC)
+- Metadata tag writing: ID3 for MP3 and WAV, Vorbis-style tags for FLAC and OGG (AAC output is untagged, see [Limitations](#limitations))
 - `init-album` command to scaffold album metadata templates
 - Structured logging with Rich output
 - Environment-based configuration via Pydantic settings
@@ -239,15 +239,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and [CHANGELOG.md](CHANG
 
 ## Tested and not tested
 
-- Tested: end-to-end `convert` (recursive and flat) to MP3, FLAC and OGG with tags, M4A/OPUS/WMA input, decode and format errors, metadata merging, `_album.md` loading, filename parsing.
+- Tested: end-to-end `convert` (recursive and flat) to MP3, WAV, FLAC and OGG with tags, AAC output, M4A/OPUS/WMA input, decode and format errors, metadata merging, `_album.md` loading, filename parsing.
 - Tag tests that need ffmpeg are skipped when it is not on PATH (CI installs ffmpeg, so they run there).
-- Known failing (strict `xfail` tests): WAV output aborts when writing tags, AAC output is rejected by ffmpeg.
+- Not tested: anything beyond short generated silence (real music, long files, non-ASCII filenames).
 
 ---
 
 ## Limitations
 
-- Tag writing works for MP3 (ID3) and Vorbis-style tags (FLAC, OGG). WAV output fails with `TypeError: ['5'] not a Frame instance` while tagging, and AAC output fails in ffmpeg (`Invalid argument`); both abort the run.
+- Tag writing works for MP3 and WAV (ID3) and for FLAC and OGG (Vorbis-style). AAC output is written as a raw ADTS stream, which has no tag container, so it is converted but left untagged (a warning is logged).
 - Input files in M4A, WMA and OPUS are discovered and decoded through ffmpeg, but they cannot be chosen as output formats.
 - The pipeline has no per-file error handling: an unreadable or undecodable file raises and aborts the run.
 - Conversion settings such as bitrate or sample rate are not configurable; pydub/ffmpeg defaults are used.
