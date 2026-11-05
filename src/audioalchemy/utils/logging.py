@@ -28,7 +28,7 @@ def configure_logging(level: str = "INFO") -> None:
     Args:
         level: Logging level string (``"DEBUG"``, ``"INFO"``, etc.).
     """
-    global _LOGGING_CONFIGURED  # noqa: PLW0603
+    global _LOGGING_CONFIGURED
     if _LOGGING_CONFIGURED:
         return
 

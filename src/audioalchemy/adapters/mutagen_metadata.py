@@ -3,8 +3,10 @@
 from pathlib import Path
 
 import mutagen
+import mutagen.aac
 import mutagen.id3
 import mutagen.mp3
+import mutagen.wave
 
 from audioalchemy.core.metadata import MetadataManager, MetadataRecord
 from audioalchemy.utils.logging import get_logger
@@ -24,6 +26,9 @@ _ID3_TAG_MAP: dict[str, str] = {
 
 _ID3_TAG_MAP_INV: dict[str, str] = {v: k for k, v in _ID3_TAG_MAP.items()}
 
+# Containers that carry ID3 frames (WAV stores them in an "id3 " chunk).
+_ID3_FILES = (mutagen.mp3.MP3, mutagen.wave.WAVE)
+
 # Generic key → VorbisComment standard key (FLAC/OGG).
 # album_artist must be written as 'albumartist' (no underscore) per spec.
 _VORBIS_NORMALISE: dict[str, str] = {
@@ -40,7 +45,7 @@ class MutagenMetadataManager(MetadataManager):
         audio = mutagen.File(path)
         if audio is None:
             raise ValueError(f"Unrecognised audio format: {path}")
-        if isinstance(audio, mutagen.mp3.MP3):
+        if isinstance(audio, _ID3_FILES):
             record: MetadataRecord = {}
             for frame_name, value in (audio.tags or {}).items():
                 generic = _ID3_TAG_MAP_INV.get(frame_name[:4])
@@ -56,7 +61,12 @@ class MutagenMetadataManager(MetadataManager):
         if audio is None:
             raise ValueError(f"Unrecognised audio format: {path}")
 
-        if isinstance(audio, mutagen.mp3.MP3):
+        if isinstance(audio, mutagen.aac.AAC):
+            # Raw ADTS streams have no tag container.
+            logger.warning("Skipping tags for %s: AAC (ADTS) cannot store tags", path.name)
+            return
+
+        if isinstance(audio, _ID3_FILES):
             if audio.tags is None:
                 audio.add_tags()
             for key, value in metadata.items():

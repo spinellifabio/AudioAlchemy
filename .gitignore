@@ -42,7 +42,7 @@ env/
 *.sublime-project
 *.sublime-workspace
 
-# Local link to CONTRIBUTING.md for Claude Code (recreate: New-Item -ItemType SymbolicLink CLAUDE.md -Target CONTRIBUTING.md)
+# Local agent notes for Claude Code (contributor docs live in CONTRIBUTING.md)
 /CLAUDE.md
 
 # Claude Code: skills are third-party and regenerable (specify init), nothing to share yet

@@ -1,6 +1,5 @@
 """Unit tests for audioalchemy.utils.filename."""
 
-import pytest
 
 from audioalchemy.utils.filename import TrackInfo, parse_filename
 
