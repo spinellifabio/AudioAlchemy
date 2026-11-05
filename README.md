@@ -140,7 +140,7 @@ Any freeform text here is ignored by the parser.
 
 `year` is accepted as a legacy alias for `date` (used only when `date` is absent).
 
-Any extra keys are captured and passed to the tag writer. For MP3 output only the standard fields above (plus title, artist and track number from the filename) are written; unknown keys are skipped. For other formats they are written as tags with the lower-cased key name.
+Any extra keys are captured and passed to the tag writer. For MP3 and WAV output only the standard fields above (plus title, artist and track number from the filename) are written; unknown keys are skipped. For FLAC and OGG they are written as tags with the lower-cased key name. AAC output is untagged.
 
 Track-level values from the filename (`title`, `artist`, `tracknumber`) override album-level values. Multiple artists are joined with ` / ` in ID3 tags and stored as multiple values in Vorbis-style tags.
 
@@ -214,6 +214,8 @@ tests/
     test_cli.py
     test_album_meta.py
     test_filename.py
+    test_adapters.py
+    test_pipeline.py
 ```
 
 ---
