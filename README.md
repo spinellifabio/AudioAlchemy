@@ -26,7 +26,7 @@ A CLI tool for batch audio conversion and metadata management.
 - Structured logging with Rich output
 - Environment-based configuration via Pydantic settings
 
-**Status:** pre-alpha (`0.1.0`). Both CLI commands are implemented end to end.
+**Status:** pre-alpha (`0.1.1`). Both CLI commands are implemented end to end.
 
 ---
 
@@ -37,7 +37,7 @@ Requires Python 3.11+ and [ffmpeg](https://ffmpeg.org/) on PATH.
 ### As a command-line tool
 
 ```bash
-pipx install git+https://github.com/spinellifabio/AudioAlchemy.git@v0.1.0
+pipx install git+https://github.com/spinellifabio/AudioAlchemy.git@v0.1.1
 ```
 
 `pip install` with the same URL works too, but `pipx` keeps the tool in its own environment.
@@ -283,5 +283,5 @@ $$╱   $$╱  $$$$$$╱   $$$$$$$╱ $$╱  $$$$$$╱  $$╱   $$╱ $$╱  $$$
                                                                                                       $$    $$╱
                                                                                                        $$$$$$╱
 
-                                                                  v0.1.0 - Code assembled in spare time by Fabio
+                                                                  v0.1.1 - Code assembled in spare time by Fabio
 ```
