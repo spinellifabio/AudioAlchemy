@@ -56,7 +56,7 @@ def convert(
         help="Destination directory for converted files.",
         resolve_path=True,
     ),
-    format: str = typer.Option(  # noqa: A002
+    format: str = typer.Option(
         None,
         "--format",
         "-f",
